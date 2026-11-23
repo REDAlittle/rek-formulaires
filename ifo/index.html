@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Questionnaire IFO Global</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* VOICE: calm, premium consulting brief, one question per screen.
+   IDEA: a REK intake form, same template as the hammam one.
+   PICTURE: the question itself, large, with a mic to answer by voice.
+   COLOUR and TYPE: REK paper, ink, lime accent; Playfair titles, Inter body.
+   LAYOUT: one column, progress rail on top, nav bottom right. */
+:root{--paper:#F4EFE9;--paper-2:#ECE6DE;--ink:#121212;--text:#2B2A28;--muted:#6F6A62;--line:#D6CEC3;
+--accent:#C8F135;--accent-ink:#121212;--accent-deep:#4E5F10;--danger:#9C2F1F;--rec:#B3261E;
+--display:'Playfair Display',Georgia,serif;--body:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;
+--ease:cubic-bezier(.16,1,.3,1);color-scheme:light}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--text);font:16px/1.55 var(--body);-webkit-font-smoothing:antialiased;overflow-x:clip}
+.rail{position:fixed;left:0;right:0;top:0;height:calc(4px + env(safe-area-inset-top,0px));background:var(--paper-2);z-index:5}
+.rail i{position:absolute;left:0;bottom:0;height:4px;width:0;background:var(--ink);transition:width .5s var(--ease)}
+.brand{position:fixed;top:calc(18px + env(safe-area-inset-top,0px));left:max(20px,env(safe-area-inset-left,0px));display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);z-index:4}
+.brand b{font-family:var(--display);font-style:italic;font-weight:600;font-size:17px;color:var(--ink)}
+.brand .sep{width:1px;height:14px;background:var(--line)}
+main{min-height:100%;display:flex;align-items:center;padding:96px max(20px,env(safe-area-inset-right,0px)) 120px max(20px,env(safe-area-inset-left,0px))}
+.stage{width:100%;max-width:680px;margin:0 auto}
+.screen{animation:in .55s var(--ease) both}.screen.out{animation:out .25s ease both}
+@keyframes in{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes out{to{opacity:0;transform:translateY(-18px)}}
+@media (prefers-reduced-motion:reduce){.screen,.screen.out{animation:none}.rail i{transition:none}.mic.on .dot{animation:none}}
+.qnum{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--accent-deep);margin-bottom:12px;font-variant-numeric:tabular-nums}
+.qnum small{font-weight:500;color:var(--muted)}
+h1,h2{font-family:var(--display);color:var(--ink);font-weight:600;text-wrap:balance;margin:0}
+h1{font-size:clamp(34px,6vw,52px);line-height:1.05;letter-spacing:-.02em}
+h2{font-size:clamp(24px,4.2vw,34px);line-height:1.15;letter-spacing:-.01em}
+.help{margin:12px 0 0;color:var(--muted);font-size:15px;line-height:1.5;max-width:58ch}
+.lead{margin:18px 0 0;font-size:17px;line-height:1.6;max-width:56ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:22px;font-size:13px;color:var(--muted)}
+.meta span{display:flex;align-items:center;gap:6px}
+.meta span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 1px var(--accent-deep) inset}
+.voicecard{margin-top:24px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.5);display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.5;max-width:560px}
+.voicecard svg{flex:none;width:20px;height:20px;margin-top:1px;color:var(--accent-deep)}
+.field{margin-top:24px}
+input[type=text],input[type=email],input[type=tel],textarea{width:100%;border:0;border-bottom:1.5px solid var(--line);background:transparent;font:inherit;font-size:clamp(19px,3.2vw,24px);color:var(--ink);padding:8px 0 10px;outline:none;border-radius:0;transition:border-color .2s}
+textarea{font-size:18px;line-height:1.5;resize:vertical;min-height:120px}
+input::placeholder,textarea::placeholder{color:#AAA398}
+input:focus,textarea:focus{border-bottom-color:var(--ink)}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:18px 28px;margin-top:26px}
+.duo label{display:block;font-size:13px;color:var(--muted)}
+.tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}
+.mic,.wa{display:inline-flex;align-items:center;gap:8px;min-height:44px;font:inherit;font-size:15px;font-weight:600;border-radius:999px;padding:9px 16px;cursor:pointer;text-decoration:none}
+.mic{background:var(--ink);color:var(--paper);border:1px solid var(--ink)}
+.mic svg,.wa svg{width:18px;height:18px;flex:none}
+.mic .dot{display:none;width:9px;height:9px;border-radius:50%;background:var(--rec)}
+.mic.on{background:#fff;color:var(--rec);border-color:var(--rec)}
+.mic.on .dot{display:inline-block;animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.wa{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.wa:hover{background:#fff}
+.tip{font-size:13px;color:var(--muted);margin-top:10px;max-width:58ch;line-height:1.5}
+.tip.warn{color:var(--accent-deep)}
+.sent{display:none;margin-top:10px;font-size:14px;color:var(--accent-deep);font-weight:500}
+.sent.on{display:block}
+.opts{display:flex;flex-direction:column;gap:9px;margin-top:24px;max-width:540px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;font-size:17px;color:var(--ink);background:rgba(255,255,255,.45);border:1px solid var(--line);border-radius:10px;padding:11px 14px;cursor:pointer;min-height:48px;transition:background .15s,border-color .15s,transform .15s var(--ease)}
+.opt:hover{background:#fff;border-color:#BDB4A7}.opt:active{transform:scale(.99)}
+.opt .k{flex:none;width:24px;height:24px;border-radius:6px;border:1px solid var(--line);background:var(--paper);display:grid;place-items:center;font-size:12px;font-weight:600;color:var(--muted)}
+.opt .t{flex:1}
+.opt .ck{flex:none;width:18px;height:18px;opacity:0}
+.opt[aria-pressed=true]{background:#fff;border-color:var(--ink)}
+.opt[aria-pressed=true] .k{background:var(--accent);border-color:var(--accent-deep);color:var(--accent-ink)}
+.opt[aria-pressed=true] .ck{opacity:1}
+.opt:focus-visible,.btn:focus-visible,.nav button:focus-visible,.link:focus-visible,.mic:focus-visible,.wa:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.other{margin-top:4px;display:none}.other.on{display:block}.other input{font-size:18px}
+.count{margin-top:12px;font-size:13px;color:var(--muted)}
+.row{display:flex;align-items:center;flex-wrap:wrap;gap:12px 16px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;gap:10px;font:inherit;font-size:16px;font-weight:600;color:var(--accent-ink);background:var(--accent);border:1px solid var(--accent-deep);border-radius:10px;padding:12px 20px;min-height:46px;cursor:pointer;text-decoration:none;transition:transform .15s var(--ease)}
+.btn svg{width:18px;height:18px;flex:none}.btn:active{transform:scale(.98)}
+.btn.dark{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.hint{font-size:13px;color:var(--muted)}
+.hint kbd{font-family:var(--body);font-size:12px;border:1px solid var(--line);border-radius:5px;padding:1px 6px;background:#fff}
+.err{color:var(--danger);font-size:14px;margin-top:12px}
+.link{background:none;border:0;padding:0;font:inherit;font-size:14px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:44px}
+.nav{position:fixed;right:max(20px,env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;z-index:4}
+.nav button{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;display:grid;place-items:center}
+.nav button:disabled{opacity:.35;cursor:default}.nav svg{width:18px;height:18px}
+.recap{margin-top:24px;border-top:1px solid var(--line)}
+.recap div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:16px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.45}
+.recap dt{color:var(--muted)}.recap dd{margin:0;color:var(--ink);overflow-wrap:anywhere;white-space:pre-line}
+.contact{margin-top:18px;font-size:14px;color:var(--muted);line-height:1.6}
+.contact b{color:var(--ink);font-weight:600;user-select:all}
+@media (max-width:520px){.hint.k-only{display:none}.recap div{grid-template-columns:1fr;gap:2px}}
+</style></head><body>
+
+<div class="rail" aria-hidden="true"><i id="bar"></i></div>
+<div class="brand"><b>REK</b><span class="sep"></span>Conseil marketing</div>
+<main><div class="stage" id="stage" aria-live="polite"></div></main>
+<div class="nav" aria-label="Navigation">
+  <button id="prev" type="button" aria-label="Question précédente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button>
+  <button id="next" type="button" aria-label="Question suivante"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+</div>
+
+<script>
+{
+const WA='33744939629', MAIL='reda.elkhayer@gmail.com', STORE='rek-ifo-form';
+const Q=[
+ {id:'intro',type:'intro'},
+ {id:'qui',type:'duo',s:'Le cadre',title:'Pour commencer, qui es-tu ?',fields:[
+  {id:'prenom_nom',label:'Prénom et nom',ph:'Ton prénom et ton nom',req:true},
+  {id:'role',label:'Ton rôle auprès d’IFO Global',ph:'Consultante marketing et réseaux sociaux…'}]},
+ {id:'client',type:'one',s:'Le cadre',title:'Qui serait le client de la mission ?',opts:['Toi, en sous-traitance','IFO Global directement','À définir ensemble']},
+ {id:'attentes',type:'long',s:'Le cadre',title:'Que fais-tu aujourd’hui pour IFO, et qu’attends-tu de moi ?',help:'Stratégie, création, publication, animation de la communauté… et ce que tu veux me confier.',ph:'En quelques phrases…'},
+ {id:'decision',type:'duo',s:'Le cadre',title:'Qui décide et qui valide ?',fields:[
+  {id:'decideur',label:'Qui décide chez IFO Global',ph:'Fondateur, direction marketing…'},
+  {id:'validateur',label:'Qui valide les contenus',ph:'Nom, fonction'},
+  {id:'delai_valid',label:'Délai habituel de validation',ph:'24 h, une semaine…',wide:true}]},
+ {id:'budget',type:'one',s:'Le cadre',title:'Quel budget mensuel est envisagé ?',help:'Une fourchette suffit, pour proposer le bon périmètre.',opts:['Moins de 1 000 €','1 000 à 2 500 €','2 500 à 5 000 €','Plus de 5 000 €','Une enveloppe globale, pas mensuelle','Je préfère en parler de vive voix']},
+ {id:'duree',type:'one',s:'Le cadre',title:'Sur quelle durée imagines-tu la collaboration ?',opts:['Un audit et une stratégie, ponctuels','Un test de 3 mois','Un accompagnement de 6 mois ou plus','À définir']},
+ {id:'notoriete',type:'long',s:'Les objectifs',title:'Dans 6 mois, à quoi verras-tu que c’est réussi ?',help:'Abonnés, vues, demandes de contact, rendez-vous, retombées presse… Avec des chiffres si tu en as.',ph:'Par exemple : 2 000 abonnés et 5 demandes de devis par mois…'},
+ {id:'cibles',type:'multi',max:3,s:'Les objectifs',title:'Qui faut-il toucher en priorité ?',help:'Jusqu’à trois réponses.',opts:['Collectionneurs privés','Galeries, fondations, maisons de vente','Familles expatriées et multi-résidentes','Prescripteurs : gestionnaires de patrimoine, avocats, notaires','Grand public amateur d’art'],other:true},
+ {id:'pays',type:'multi',s:'Les objectifs',title:'Sur quels marchés ?',help:'Plusieurs réponses possibles.',opts:['France','Royaume-Uni','Liban et Moyen-Orient','Golfe (Émirats, Arabie saoudite…)'],other:true},
+ {id:'sujets',type:'multi',s:'Les objectifs',title:'De quoi les contenus doivent-ils parler ?',help:'Plusieurs réponses possibles.',opts:['L’art uniquement','Yachts et bateaux','Voitures de collection','Propriétés d’exception','Santé internationale et expatriation','Tous les métiers d’IFO Global']},
+ {id:'valeur',type:'long',s:'Les objectifs',title:'Combien vaut un client pour IFO Global ?',help:'Prime ou commission moyenne par an, même approximative. Cela permet de savoir combien investir pour en gagner un.',ph:'Ordre de grandeur…'},
+ {id:'comptes',type:'duo',s:'L’existant',title:'Combien d’abonnés sur chaque réseau ?',help:'Laisse vide si le compte n’existe pas.',fields:[
+  {id:'ab_insta',label:'Instagram',ph:'140'},{id:'ab_linkedin',label:'LinkedIn',ph:'Nombre d’abonnés'},
+  {id:'ab_youtube',label:'YouTube',ph:'Nombre d’abonnés'},{id:'ab_tiktok',label:'TikTok ou autre',ph:'Nombre d’abonnés'}]},
+ {id:'video23k',type:'long',s:'L’existant',title:'La vidéo à 23 000 vues : qu’a-t-elle eu de différent ?',help:'Colle son lien et ceux de 3 ou 4 vidéos qui ont plafonné. Sujet, accroche, format, publicité, partage par un compte connu…',ph:'Liens et ce que tu as remarqué…'},
+ {id:'stats',type:'one',s:'L’existant',title:'Peux-tu partager les statistiques Instagram des 90 derniers jours ?',help:'Portée, durée de visionnage, partages, enregistrements, part de non-abonnés.',opts:['Oui, j’envoie des captures d’écran','Oui, je peux donner un accès au compte','C’est compliqué, on en parle']},
+ {id:'frequence',type:'one',s:'L’existant',title:'À quel rythme publiez-vous aujourd’hui ?',opts:['Moins d’une fois par semaine','1 à 2 fois par semaine','3 à 4 fois par semaine','Tous les jours']},
+ {id:'formats',type:'multi',s:'L’existant',title:'Quels formats utilisez-vous ?',help:'Plusieurs réponses possibles.',opts:['Reels','Carrousels','Posts photo','Stories','Vidéos longues YouTube','Posts LinkedIn'],other:true},
+ {id:'pub',type:'one',s:'L’existant',title:'Y a-t-il de la publicité payante ?',opts:['Non, seulement de l’organique','Ponctuellement, pour booster un post','Oui, des campagnes régulières'],other:true},
+ {id:'charte',type:'long',s:'L’existant',title:'Charte, ton imposé, sujets interdits ?',help:'Tout ce que je dois respecter. Tu peux aussi coller un lien vers la charte.',ph:'Couleurs, ton, mots à éviter…'},
+ {id:'podcast',type:'long',s:'L’existant',title:'Et le podcast « La Parenthèse IFO » ?',help:'Nombre d’épisodes, audience, est-il filmé, qui l’enregistre ?',ph:'Ce que tu sais…'},
+ {id:'ecran',type:'multi',s:'La production',title:'Qui peut apparaître à l’écran ?',help:'Plusieurs réponses possibles.',opts:['Le fondateur','Des experts d’IFO Global','Des invités : experts en art, restaurateurs, galeristes, transporteurs','Personne, on préfère sans visage'],other:true},
+ {id:'temps',type:'long',s:'La production',title:'Combien de temps ces personnes peuvent-elles y consacrer ?',help:'Par mois, et où : Paris, Londres, Beyrouth ?',ph:'Une demi-journée par mois à Paris…'},
+ {id:'tournage',type:'one',s:'La production',title:'Aujourd’hui, qui filme et qui monte ?',opts:['Moi-même, au téléphone','Quelqu’un de l’équipe IFO','Un prestataire vidéo','Personne pour l’instant'],other:true},
+ {id:'images',type:'long',s:'La production',title:'Avez-vous des images exploitables ?',help:'Événements, ventes aux enchères, foires, ports francs, ateliers de restauration, photos d’équipe…',ph:'Ce qui existe déjà…'},
+ {id:'ia',type:'one',s:'La production',title:'Les contenus créés avec l’IA sont-ils acceptables ?',help:'Motion design, illustrations, reconstitutions d’affaires célèbres.',opts:['Oui, sans restriction','Oui pour le motion design et les illustrations, pas pour des personnes','Non, uniquement du tourné','À discuter']},
+ {id:'volume',type:'one',s:'La production',title:'Combien de contenus par semaine visez-vous ?',opts:['1 à 2','3 à 4','5 ou plus','À définir ensemble']},
+ {id:'langues',type:'multi',s:'La production',title:'Dans quelles langues ?',help:'Plusieurs réponses possibles.',opts:['Français','Anglais','Arabe'],other:true},
+ {id:'conformite',type:'long',s:'Règles et validation',title:'Quelles règles de conformité s’appliquent ?',help:'Mentions obligatoires, passage par un service conformité, sujets sensibles pour un courtier.',ph:'Ce qui est imposé…'},
+ {id:'histoires',type:'one',s:'Règles et validation',title:'Peut-on raconter des histoires vraies ?',help:'Sinistres réels anonymisés, affaires médiatisées : vols, faux, casse du Louvre…',opts:['Oui, les deux','Seulement les affaires déjà publiques','Seulement des sinistres anonymisés','À valider avec la conformité']},
+ {id:'partenaires',type:'long',s:'Règles et validation',title:'Des partenaires avec qui faire des contenus communs ?',help:'Assureurs, maisons de vente, galeries, foires, gestionnaires de patrimoine.',ph:'Noms ou types de partenaires…'},
+ {id:'perimetre',type:'multi',s:'Le devis',title:'Qu’attendez-vous de moi ?',help:'Plusieurs réponses possibles.',opts:['Audit et stratégie','Formats et accroches qui retiennent','Écriture des scripts','Tournage','Montage et motion design','Publication et programmation','Analyse mensuelle des résultats','Formation de votre équipe']},
+ {id:'echeance',type:'long',s:'Le devis',title:'Pour quand voulez-vous les premiers résultats ?',help:'Y a-t-il un temps fort à viser : foire, vente, lancement, salon ?',ph:'Date ou événement…'},
+ {id:'plus',type:'long',s:'Le devis',title:'Autre chose à me dire ?',help:'Facultatif.',ph:'Ce qui te semble important…'},
+ {id:'contact',type:'duo',s:'Le devis',title:'Comment te recontacter ?',help:'Pour caler un échange de 20 minutes avant le devis.',fields:[
+  {id:'telephone',label:'Téléphone',ph:'06 12 34 56 78',kind:'tel'},
+  {id:'email',label:'E-mail',ph:'toi@exemple.com',kind:'email'},
+  {id:'creneau',label:'Tes meilleurs créneaux',ph:'Mardi matin, jeudi après 14 h…',wide:true}]},
+ {id:'fin',type:'end'}
+];
+const KEYS='ABCDEFGHIJ';
+let A={}, i=0;
+try{const s=localStorage.getItem(STORE);if(s){const o=JSON.parse(s);A=o.A||{};i=Math.min(o.i||0,Q.length-1);}}catch(e){}
+const save=()=>{try{localStorage.setItem(STORE,JSON.stringify({A,i}));}catch(e){}};
+const stage=document.getElementById('stage'),bar=document.getElementById('bar'),prevB=document.getElementById('prev'),nextB=document.getElementById('next');
+const total=Q.filter(q=>q.type!=='intro'&&q.type!=='end').length;
+const qIndex=n=>{let c=0;for(let k=1;k<=n;k++)if(Q[k].type!=='intro'&&Q[k].type!=='end')c++;return c;};
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const arrow='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const check='<svg class="ck" viewBox="0 0 24 24" fill="none" stroke="#121212" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const micSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+
+/* Voice: the browser's own speech recognition, live, like a chat mic. Falls back to the phone keyboard's mic. */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let sr=null, listening=false, curTa=null, base='', live='';
+function setMic(on){listening=on;const b=document.getElementById('mic');if(!b)return;b.classList.toggle('on',on);b.querySelector('.lbl').textContent=on?'Arrêter':'Répondre à la voix';b.setAttribute('aria-pressed',on);const t=document.getElementById('tip');if(t&&on){t.classList.remove('warn');t.textContent='Je t’écoute… parle naturellement, le texte s’écrit au fur et à mesure.';}}
+function tip(msg){const t=document.getElementById('tip');if(t){t.textContent=msg;t.classList.add('warn');}}
+const KBD='La dictée n’est pas disponible dans ce navigateur. Sur téléphone, touche la zone de réponse puis le micro de ton clavier. Sur ordinateur, ouvre le lien dans Chrome ou Safari.';
+const DENIED='Le micro a été refusé. Autorise-le dans les réglages du navigateur pour cette page, ou utilise le micro de ton clavier.';
+function stopVoice(){if(sr){try{sr.stop();}catch(e){}}setMic(false);}
+function startVoice(ta){
+  if(listening){stopVoice();return;}
+  if(!SR){ta.focus();tip(KBD);return;}
+  curTa=ta;base=ta.value?ta.value.replace(/\s+$/,'')+' ':'';live='';
+  try{
+    sr=new SR();sr.lang='fr-FR';sr.continuous=true;sr.interimResults=true;
+    sr.onresult=e=>{let part='';for(let k=e.resultIndex;k<e.results.length;k++){const r=e.results[k];if(r.isFinal){base+=r[0].transcript.trim()+' ';}else part+=r[0].transcript;}
+      curTa.value=(base+part).replace(/^\s+/,'');curTa.dispatchEvent(new Event('input'));curTa.scrollTop=curTa.scrollHeight;};
+    sr.onerror=ev=>{setMic(false);if(ev.error==='not-allowed'||ev.error==='service-not-allowed')tip(DENIED);else if(ev.error!=='no-speech'&&ev.error!=='aborted')tip(KBD);};
+    sr.onend=()=>{if(listening){try{sr.start();return;}catch(e){}}setMic(false);};
+    sr.start();setMic(true);
+  }catch(e){setMic(false);tip(KBD);}
+}
+
+function render(){
+  const q=Q[i];let h='';
+  if(listening){listening=false;try{sr&&sr.stop();}catch(e){}}
+  bar.style.width=(q.type==='intro'?0:q.type==='end'?100:Math.round(qIndex(i)/total*100))+'%';
+  prevB.disabled=i===0;nextB.disabled=q.type==='end';
+  if(q.type==='intro'){
+    h='<h1>IFO Global sur les réseaux sociaux</h1>'+
+      '<p class="lead">Bonjour Dina, et merci pour ton temps. Ces questions me permettent de comprendre la situation d’IFO Global et de chiffrer précisément la mission avant de t’envoyer ma proposition.</p>'+
+      '<div class="meta"><span>'+total+' questions</span><span>10 minutes environ, moins à la voix</span><span>Tu peux passer les questions</span></div>'+
+      '<div class="voicecard">'+micSvg+'<div><b>Tu peux répondre à la voix.</b> Sur les questions ouvertes, touche « Répondre à la voix » et parle : ta réponse s’écrit en direct. Le navigateur te demandera une seule fois l’accès au micro. Tes réponses restent enregistrées si tu fais une pause.</div></div>'+
+      '<div class="row"><button class="btn" id="go" type="button">Commencer '+arrow+'</button><span class="hint k-only">ou appuie sur <kbd>Entrée ↵</kbd></span></div>';
+  }else if(q.type==='end'){
+    h='<h2>Merci, c’est terminé.</h2><p class="lead">Dernière étape : envoie-moi tes réponses. Le bouton ouvre WhatsApp avec le message déjà rédigé, il te suffit de l’envoyer.</p>'+
+      '<div class="row"><a class="btn" id="wa" target="_blank" rel="noopener">Envoyer sur WhatsApp '+arrow+'</a><button class="btn ghost" id="cp" type="button">Copier mes réponses</button></div>'+
+      '<p class="err" id="cpmsg" role="status"></p>'+
+      '<p class="contact">Tu préfères l’e-mail ? Copie tes réponses et envoie-les à <b>'+MAIL+'</b><br>ou par message au <b>07 44 93 96 29</b>.</p>'+
+      '<dl class="recap" id="recap"></dl>';
+  }else{
+    h='<div class="qnum">'+qIndex(i)+' / '+total+' <small>· '+esc(q.s)+'</small></div><h2 id="qt">'+esc(q.title)+'</h2>'+(q.help?'<p class="help">'+esc(q.help)+'</p>':'');
+    if(q.type==='duo'){
+      h+='<div class="duo">'+q.fields.map(f=>'<div'+(f.wide?' style="grid-column:1/-1"':'')+'><label for="f_'+f.id+'">'+esc(f.label)+(f.req?'&nbsp;*':'')+'</label><input id="f_'+f.id+'" type="'+(f.kind||'text')+'" placeholder="'+esc(f.ph)+'" value="'+esc(A[f.id]||'')+'" autocomplete="off"></div>').join('')+'</div>';
+    }else if(q.type==='long'){
+      h+='<div class="field"><textarea id="f_'+q.id+'" placeholder="'+esc(q.ph)+'" aria-labelledby="qt">'+esc(A[q.id]||'')+'</textarea></div>'+
+        '<div class="tools"><button class="mic" id="mic" type="button" aria-pressed="false"><span class="dot"></span>'+micSvg+'<span class="lbl">Répondre à la voix</span></button></div>'+
+        '<p class="tip" id="tip">Touche le micro et parle : ta réponse s’écrit en direct, tu peux la corriger ensuite.</p>';
+    }else{
+      const cur=A[q.id];const sel=q.type==='multi'?(cur&&cur.v||[]):(cur?[cur.v]:[]);
+      h+='<div class="opts" role="group" aria-labelledby="qt">'+q.opts.map((o,k)=>'<button type="button" class="opt" data-v="'+esc(o)+'" aria-pressed="'+(sel.indexOf(o)>-1)+'"><span class="k">'+KEYS[k]+'</span><span class="t">'+esc(o)+'</span>'+check+'</button>').join('');
+      if(q.other){const on=sel.indexOf('Autre')>-1;h+='<button type="button" class="opt" data-v="Autre" aria-pressed="'+on+'"><span class="k">'+KEYS[q.opts.length]+'</span><span class="t">Autre</span>'+check+'</button><div class="other'+(on?' on':'')+'" id="otherbox"><input type="text" id="f_other" placeholder="Précise…" value="'+esc(cur&&cur.other||'')+'" aria-label="Précise"></div>';}
+      h+='</div>'+(q.max?'<p class="count" id="cnt"></p>':'');
+    }
+    const req=q.type==='duo'&&q.fields.some(f=>f.req);
+    h+='<p class="err" id="err" role="alert"></p><div class="row"><button class="btn dark" id="ok" type="button">'+(i===Q.length-2?'Terminer':'Valider')+' '+arrow+'</button><span class="hint k-only">appuie sur <kbd>Entrée ↵</kbd></span>'+(req?'':'<button class="link" id="skip" type="button">Passer</button>')+'</div>';
+  }
+  const el=document.createElement('section');el.className='screen';el.innerHTML=h;
+  stage.innerHTML='';stage.appendChild(el);wire(q);save();
+}
+function collect(q){
+  if(q.type==='duo')q.fields.forEach(f=>{A[f.id]=(document.getElementById('f_'+f.id).value||'').trim();});
+  else if(q.type==='long')A[q.id]=(document.getElementById('f_'+q.id).value||'').trim();
+  else{const ot=document.getElementById('f_other');if(ot&&A[q.id])A[q.id].other=ot.value.trim();}
+}
+function valid(q){if(q.type==='duo')for(const f of q.fields)if(f.req&&!A[f.id])return 'Merci de renseigner : '+f.label.toLowerCase()+'.';return '';}
+function go(n){const cur=stage.firstChild;if(cur)cur.classList.add('out');setTimeout(()=>{i=n;render();const f=stage.querySelector('input,textarea');if(f&&window.matchMedia('(pointer:fine)').matches)f.focus();},cur?180:0);}
+function next(){const q=Q[i];if(q.type==='end')return;if(q.type!=='intro'){collect(q);const e=valid(q);if(e){document.getElementById('err').textContent=e;return;}}go(i+1);}
+function prev(){if(i===0)return;const q=Q[i];if(q.type!=='intro'&&q.type!=='end')collect(q);go(i-1);}
+function summary(){
+  const L=[];
+  Q.forEach(q=>{
+    if(q.type==='duo')q.fields.forEach(f=>{if(A[f.id])L.push([f.label,A[f.id]]);});
+    else if(q.type==='long'){const parts=[];if(A[q.id])parts.push(A[q.id]);if(parts.length)L.push([q.title,parts.join('\n')]);}
+    else if(q.type==='one'||q.type==='multi'){const a=A[q.id];if(!a)return;const v=q.type==='multi'?a.v.slice():[a.v];const ix=v.indexOf('Autre');if(ix>-1)v[ix]='Autre'+(a.other?' : '+a.other:'');if(v.length)L.push([q.title,v.join(', ')]);}
+  });
+  return L;
+}
+function wire(q){
+  const g=document.getElementById('go');if(g)g.onclick=next;
+  const ok=document.getElementById('ok');if(ok)ok.onclick=next;
+  const sk=document.getElementById('skip');if(sk)sk.onclick=()=>{collect(q);go(i+1);};
+  if(q.type==='long'){
+    const ta=document.getElementById('f_'+q.id);
+    document.getElementById('mic').onclick=()=>startVoice(ta);
+    ta.addEventListener('input',()=>{A[q.id]=ta.value;save();});
+  }
+  if(q.type==='one'||q.type==='multi'){
+    const cnt=document.getElementById('cnt');
+    const upd=()=>{if(cnt){const n=(A[q.id]&&A[q.id].v||[]).length;cnt.textContent=n+' sur '+q.max+' choisie'+(n>1?'s':'');}};
+    upd();
+    stage.querySelectorAll('.opt').forEach(b=>{b.onclick=()=>{
+      const v=b.getAttribute('data-v');const err=document.getElementById('err');err.textContent='';
+      if(q.type==='one'){const o=document.getElementById('f_other');A[q.id]={v,other:o?o.value.trim():''};stage.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed',x===b));const box=document.getElementById('otherbox');
+        if(box){box.classList.toggle('on',v==='Autre');if(v==='Autre'){document.getElementById('f_other').focus();return;}}
+        setTimeout(next,260);
+      }else{const a=A[q.id]||{v:[],other:''};const k=a.v.indexOf(v);
+        if(k>-1)a.v.splice(k,1);else{if(q.max&&a.v.length>=q.max){err.textContent='Trois choix maximum : retires-en un pour en ajouter un autre.';return;}a.v.push(v);}
+        A[q.id]=a;b.setAttribute('aria-pressed',k===-1);const box2=document.getElementById('otherbox');if(box2&&v==='Autre'){box2.classList.toggle('on',k===-1);if(k===-1)document.getElementById('f_other').focus();}upd();save();}
+    };});
+  }
+  if(q.type==='end'){
+    const L=summary();const rc=document.getElementById('recap');
+    rc.innerHTML=L.map(p=>'<div><dt>'+esc(p[0])+'</dt><dd>'+esc(p[1])+'</dd></div>').join('');
+    const txt='Questionnaire IFO Global\n\n'+L.map(p=>'• '+p[0]+'\n'+p[1]).join('\n\n');
+    document.getElementById('wa').href='https://wa.me/'+WA+'?text='+encodeURIComponent(txt);
+    document.getElementById('cp').onclick=()=>{const m=document.getElementById('cpmsg');
+      const fallback=()=>{const r=document.createRange();r.selectNodeContents(rc);const s=window.getSelection();s.removeAllRanges();s.addRange(r);m.style.color='var(--muted)';m.textContent='Le récapitulatif est sélectionné : copie-le avec Ctrl+C ou ⌘+C.';};
+      try{navigator.clipboard.writeText(txt).then(()=>{m.style.color='var(--accent-deep)';m.textContent='Réponses copiées. Colle-les dans un e-mail ou un message.';},fallback);}catch(e){fallback();}
+    };
+  }
+}
+prevB.onclick=prev;nextB.onclick=next;
+document.addEventListener('keydown',e=>{
+  const q=Q[i];const tag=(e.target&&e.target.tagName)||'';
+  if(e.key==='Enter'&&!e.shiftKey){if(tag==='TEXTAREA'||tag==='BUTTON'||tag==='A')return;e.preventDefault();next();return;}
+  if((q.type==='one'||q.type==='multi')&&tag!=='INPUT'&&tag!=='TEXTAREA'&&!e.metaKey&&!e.ctrlKey&&!e.altKey){const k=KEYS.indexOf(e.key.toUpperCase());const bs=stage.querySelectorAll('.opt');if(k>-1&&bs[k]){e.preventDefault();bs[k].click();}}
+});
+render();
+}
+</script>
+</body></html>
