@@ -169,17 +169,19 @@ let sr=null, listening=false, curTa=null, base='', live='';
 function setMic(on){listening=on;const b=document.getElementById('mic');if(!b)return;b.classList.toggle('on',on);b.querySelector('.lbl').textContent=on?'Arrêter':'Répondre à la voix';b.setAttribute('aria-pressed',on);const t=document.getElementById('tip');if(t&&on){t.classList.remove('warn');t.textContent='Je t’écoute… parle naturellement, le texte s’écrit au fur et à mesure.';}}
 function tip(msg){const t=document.getElementById('tip');if(t){t.textContent=msg;t.classList.add('warn');}}
 const KBD='La dictée n’est pas disponible dans ce navigateur. Sur téléphone, touche la zone de réponse puis le micro de ton clavier. Sur ordinateur, ouvre le lien dans Chrome ou Safari.';
+const NOMIC='Aucun micro détecté sur cet appareil. Branche un micro ou réponds depuis ton téléphone.';
 const DENIED='Le micro a été refusé. Autorise-le dans les réglages du navigateur pour cette page, ou utilise le micro de ton clavier.';
 function stopVoice(){if(sr){try{sr.stop();}catch(e){}}setMic(false);}
 function startVoice(ta){
   if(listening){stopVoice();return;}
   if(!SR){ta.focus();tip(KBD);return;}
+  if(navigator.mediaDevices&&navigator.mediaDevices.enumerateDevices){navigator.mediaDevices.enumerateDevices().then(d=>{if(!d.some(x=>x.kind==='audioinput')){stopVoice();tip(NOMIC);}}).catch(()=>{});}
   curTa=ta;base=ta.value?ta.value.replace(/\s+$/,'')+' ':'';live='';
   try{
     sr=new SR();sr.lang='fr-FR';sr.continuous=true;sr.interimResults=true;
     sr.onresult=e=>{let part='';for(let k=e.resultIndex;k<e.results.length;k++){const r=e.results[k];if(r.isFinal){base+=r[0].transcript.trim()+' ';}else part+=r[0].transcript;}
       curTa.value=(base+part).replace(/^\s+/,'');curTa.dispatchEvent(new Event('input'));curTa.scrollTop=curTa.scrollHeight;};
-    sr.onerror=ev=>{setMic(false);if(ev.error==='not-allowed'||ev.error==='service-not-allowed')tip(DENIED);else if(ev.error!=='no-speech'&&ev.error!=='aborted')tip(KBD);};
+    sr.onerror=ev=>{setMic(false);if(ev.error==='audio-capture')tip(NOMIC);else if(ev.error==='not-allowed'||ev.error==='service-not-allowed')tip(DENIED);else if(ev.error!=='no-speech'&&ev.error!=='aborted')tip(KBD);};
     sr.onend=()=>{if(listening){try{sr.start();return;}catch(e){}}setMic(false);};
     sr.start();setMic(true);
   }catch(e){setMic(false);tip(KBD);}
